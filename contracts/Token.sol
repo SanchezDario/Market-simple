@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract Token is ERC20{
     address public owner;
-    address public mediator;
     address public marketplace;
 
     // Initial supply of 80.000.000
@@ -17,22 +16,14 @@ contract Token is ERC20{
 
     modifier onlyOwner() { require(msg.sender == owner, "Isn't the owner"); _; }
 
-    modifier onlyMediator() { require(msg.sender == mediator, "Don't have permisions"); _; }
-
-
     // ************ CORE FUNCTIONS ****************
 
-    constructor() ERC20("BlockJobs Token", "BJT") {
+    constructor() ERC20("MyMarket Token", "MMT") {
         owner = msg.sender;
     }
 
-    function setMediatorContract(address _mediator) public onlyOwner returns(bool) {
-        mediator = _mediator;
-        return true;
-    }
-
     function setMarketplaceContract(address _marketplace) public onlyOwner returns(bool) {
-        mediator = _marketplace;
+        marketplace = _marketplace;
         return true;
     }
 
@@ -76,25 +67,4 @@ contract Token is ERC20{
         return true;
     }
 
-    /** Increment in 3% the amount of tokens of the indicated jury member.
-     *  Only executable by the mediator contract for correct votes.
-     *  @return the new balance.
-     */
-    function increaseAllowance(address _to) public onlyMediator returns(uint) {
-        // Increase the amount of tokens pending to mint
-        pendingMint += (blockedTokens[_to] / 1000 * 1025 - blockedTokens[_to]);
-
-        // Increase the tokens of the jury member
-        blockedTokens[_to] = blockedTokens[_to] / 1000 * 1025;
-
-        return blockedTokens[_to];
-    }
-
-    /** Reduce in 3% the amount of tokens of the indicated jury member.
-     *  Only executable by the mediator contract for incorrect votes.
-     */
-    function decreaseAllowance(address _to) public onlyMediator returns(uint) {
-        blockedTokens[_to] = blockedTokens[_to] / 103 * 100;
-        return blockedTokens[_to];
-    }
 }
